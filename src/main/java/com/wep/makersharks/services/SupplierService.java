@@ -5,12 +5,11 @@ import com.wep.makersharks.models.ManufacturingProcesses;
 import com.wep.makersharks.models.NatureOfBusiness;
 import com.wep.makersharks.models.Supplier;
 import com.wep.makersharks.repository.SupplierRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SupplierService {
@@ -22,33 +21,27 @@ public class SupplierService {
     }
 
     @Transactional
-    public List<SupplierDTO> getSupplier(String location , ManufacturingProcesses manufacturingProcesses , NatureOfBusiness capability){
+    public Page<SupplierDTO> getSupplier(String location, ManufacturingProcesses manufacturingProcesses,
+                                         NatureOfBusiness capability, int page, int size) {
+        try {
+            Pageable pageable = PageRequest.of(page, size);
+            Page<Supplier> suppliersPage = supplierRepository.findByLocationAndManufacturingProcessesAndNatureOfBusiness(
+                    location, manufacturingProcesses, capability, pageable);
 
-        try{
-            List<Supplier> suppliers = supplierRepository.getSuppliers(location , manufacturingProcesses,  capability);
-
-            if(suppliers.size() == 0){
-                throw  new RuntimeException("No supplier found with given conditions!!");
+            if (suppliersPage.isEmpty()) {
+                throw new RuntimeException("No supplier found with given conditions!!");
             }
 
-            List<SupplierDTO> suppliersList = new ArrayList<>();
-
-            for(Supplier supplier : suppliers){
-               SupplierDTO supplierDTO = SupplierDTO.builder()
-                       .supplierId(supplier.getSupplier_id())
-                       .website(supplier.getWebsite())
-                       .location(supplier.getLocation())
-                       .companyName(supplier.getCompany_name())
-                       .natureOfBusiness(supplier.getNatureOfBusiness().name())
-                       .manufacturingProcesses(supplier.getManufacturingProcesses().name())
-                       .build();
-
-               suppliersList.add(supplierDTO);
-            }
-
-            return suppliersList;
-        }
-        catch (Exception e){
+            // Convert Supplier entities to SupplierDTOs
+            return suppliersPage.map(supplier -> SupplierDTO.builder()
+                    .supplierId(supplier.getSupplier_id())
+                    .website(supplier.getWebsite())
+                    .location(supplier.getLocation())
+                    .companyName(supplier.getCompany_name())
+                    .natureOfBusiness(supplier.getNatureOfBusiness().name())
+                    .manufacturingProcesses(supplier.getManufacturingProcesses().name())
+                    .build());
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
     }
