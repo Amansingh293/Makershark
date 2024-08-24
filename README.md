@@ -1,7 +1,7 @@
 #Installation guide
 steps => 
     1. git clone the repository
-    2. then start the application in itellij
+    2. then start the application in intellij
 
 
 Flow of applicaiton
