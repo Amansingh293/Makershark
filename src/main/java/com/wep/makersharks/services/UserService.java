@@ -12,6 +12,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -57,25 +59,28 @@ public class UserService {
     @Transactional
     public UserSessionDTO login(UserSessionDTO request) {
         try {
-            // Authenticate the user
+            System.out.println(request.getEmail());
+            User user = userRepository.findByEmail(request.getEmail());
+
+            if(user == null ){
+                throw new RuntimeException("No User found!!");
+            }
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
 
-            User user = userRepository.findByEmail(request.getEmail());
-
             String token = jwtService.generateToken(user);
 
-            UserSessionDTO userSessionDTO = UserSessionDTO.builder().userId(1L)
+            UserSessionDTO userSessionDTO = UserSessionDTO.builder()
                     .email(user.getEmail())
-                    .username(user.getUsername())
                     .message("Login successful")
                     .token(token)
                     .build();
 
             return userSessionDTO;
+
         } catch (Exception e) {
-            return new UserSessionDTO("Invalid Credentials!!");
+            throw new RuntimeException(e.getMessage());
         }
     }
     @Transactional

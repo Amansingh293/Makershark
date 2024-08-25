@@ -26,16 +26,7 @@ public class UserSessionDTO {
     }
 
     public void validateDTO() {
-        if (this.email == null || this.email.isEmpty()) {
-            throw new IllegalArgumentException("Email Required!");
-        }
-        if (this.username == null || this.username.isEmpty()) {
-            throw new IllegalArgumentException("Username Required!");
-        }
 
-        if (this.password == null || this.password.isEmpty()) {
-            throw new IllegalArgumentException("Password Required!");
-        }
     }
 
 

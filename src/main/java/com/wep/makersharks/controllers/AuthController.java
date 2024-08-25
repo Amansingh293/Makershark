@@ -27,11 +27,12 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody UserSessionDTO user) {
 
         try {
-            user.validateDTO();
+            if (user.getEmail() == null) {
+                throw new IllegalArgumentException("Email Required!");
+            }
 
-            // Check if user exists
-            if (!userServices.UserExists(user.getEmail())) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+            if (user.getPassword() == null) {
+                throw new IllegalArgumentException("Password Required!");
             }
 
             // Attempt login
@@ -44,14 +45,23 @@ public class AuthController {
 
         } catch (Exception e) {
             // Log the exception
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred during login");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred during login"+e.getMessage());
         }
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> signup(@RequestBody UserSessionDTO user) {
         try {
-            user.validateDTO();
+            if (user.getEmail() == null) {
+                throw new IllegalArgumentException("Email Required!");
+            }
+            if (user.getUsername() == null) {
+                throw new IllegalArgumentException("Username Required!");
+            }
+
+            if (user.getPassword() == null) {
+                throw new IllegalArgumentException("Password Required!");
+            }
 
             // Check if user already exists
             if (userServices.UserExists(user.getEmail())) {
