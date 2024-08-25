@@ -17,7 +17,8 @@ Flow of applicaiton
    curl -X POST "http://localhost:8080/api/suppliers/search?location=Seattle&manufacturingProcesses=printing_3d&capability=small_scale&page=0&size=10" \
      -H "Authorization: Bearer YOUR_AUTH_TOKEN"
 
-    # Login curl request =>
+
+#Login curl request =>
 
     curl -X POST http://localhost:8080/api/auth/login \
      -H "Content-Type: application/json" \
